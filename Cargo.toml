@@ -1,0 +1,13 @@
+[package]
+name = "ares"
+version = "0.1.0"
+authors = ["Armin Primadi <aprimadi@gmail.com>"]
+edition = "2018"
+license = "MIT"
+description = "A 2D turn-based tactical game."
+
+[dependencies]
+env_logger = "0.9"
+log = "0.4"
+mq = { package = "macroquad", version = "0.3" }
+

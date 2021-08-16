@@ -1,0 +1,2 @@
+- Use kill for exp
+- Use speed for turn system
