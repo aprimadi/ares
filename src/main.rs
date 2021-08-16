@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use mq::{input, window};
 
+mod assets;
 mod error;
 mod screen;
 mod utils;
