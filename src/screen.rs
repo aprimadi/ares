@@ -7,6 +7,8 @@ use crate::{utils, AResult};
 
 mod main_menu;
 
+pub use main_menu::MainMenu;
+
 pub const COLOR_SCREEN_BG: Color = Color::new(0.9, 0.9, 0.8, 1.0);
 pub const COLOR_POPUP_BG: Color = Color::new(0.9, 0.9, 0.8, 0.9);
 

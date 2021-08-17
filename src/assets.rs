@@ -1,12 +1,16 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::lazy::OnceCell;
 
+use mq::file::load_file;
 use mq::text;
 use mq::text::Font;
-use mq::texture::Texture2D;
+use mq::texture::{load_texture, Texture2D};
+use once_cell::sync::OnceCell;
+use serde::Deserialize;
+use serde::de::DeserializeOwned;
 
 use crate::AResult;
+use crate::error::AError;
 
 static INSTANCE: OnceCell<Assets> = OnceCell::new();
 
@@ -29,7 +33,7 @@ async fn read_file(path: &str) -> AResult<String> {
 
 async fn deserialize_from_file<D: DeserializeOwned>(path: &str) -> AResult<D> {
     let s = read_file(path).await?;
-    ron::de::from_str(&s).map_err(|e| ZError::from_ron_de_error(e, path.into()))
+    ron::de::from_str(&s).map_err(|e| AError::from_ron_de_error(e, path.into()))
 }
 
 async fn load_map<Key: Hash + Eq + Copy>(
@@ -58,19 +62,18 @@ fn default_sub_tile_z() -> f32 {
     0.0
 }
 
-type SpritesInfo = HashMap<ObjType, SpriteInfo>;
+type SpritesInfo = HashMap<String, SpriteInfo>;
 
 #[derive(Debug)]
 pub struct Assets {
     pub textures: Textures,
     pub font: Font,
     pub sprites_info: SpritesInfo,
-    pub sprite_frames: HashMap<ObjType, HashMap<String, Texture2D>>,
-    pub prototypes: Prototypes,
+    pub sprite_frames: HashMap<String, HashMap<String, Texture2D>>,
 }
 
 impl Assets {
-    pub async fn load() -> ZResult<Self> {
+    pub async fn load() -> AResult<Self> {
         let sprites_info: SpritesInfo = deserialize_from_file("sprites.ron").await?;
         let sprite_frames = {
             let mut sprite_frames = HashMap::new();
@@ -88,7 +91,6 @@ impl Assets {
             font: text::load_ttf_font("OpenSans-Regular.ttf").await?,
             sprites_info,
             sprite_frames,
-            prototypes: Prototypes::from_str(&read_file("objects.ron").await?),
         })
     }
 }
@@ -96,16 +98,14 @@ impl Assets {
 #[derive(Debug)]
 pub struct Textures {
     pub map: MapObjectTextures,
-    pub weapon_flashes: HashMap<WeaponType, Texture2D>,
     pub icons: IconTextures,
     pub dot: Texture2D,
 }
 
 impl Textures {
-    async fn load() -> ZResult<Self> {
+    async fn load() -> AResult<Self> {
         Ok(Self {
             map: MapObjectTextures::load().await?,
-            weapon_flashes: load_weapon_flashes().await?,
             icons: IconTextures::load().await?,
             dot: load_texture("img/dot.png").await?,
         })
@@ -144,59 +144,15 @@ pub struct IconTextures {
     pub info: Texture2D,
     pub end_turn: Texture2D,
     pub main_menu: Texture2D,
-    pub abilities: HashMap<Ability, Texture2D>,
-    pub lasting_effects: HashMap<effect::Lasting, Texture2D>,
 }
 
 impl IconTextures {
-    async fn load() -> ZResult<Self> {
+    async fn load() -> AResult<Self> {
         Ok(Self {
             info: load_texture("img/icon_info.png").await?,
             end_turn: load_texture("img/icon_end_turn.png").await?,
             main_menu: load_texture("img/icon_menu.png").await?,
-            abilities: load_ability_icons().await?,
-            lasting_effects: load_lasting_effects().await?,
         })
     }
-}
-
-async fn load_weapon_flashes() -> ZResult<HashMap<WeaponType, Texture2D>> {
-    let map = &[
-        (WeaponType::Slash, "slash"),
-        (WeaponType::Smash, "smash"),
-        (WeaponType::Pierce, "pierce"),
-        (WeaponType::Claw, "claw"),
-    ];
-    load_map(map, |s| format!("img/{}.png", s)).await
-}
-
-async fn load_ability_icons() -> ZResult<HashMap<Ability, Texture2D>> {
-    let map = &[
-        (Ability::Knockback, "knockback"),
-        (Ability::Club, "club"),
-        (Ability::Jump, "jump"),
-        (Ability::LongJump, "long_jump"),
-        (Ability::Bomb, "bomb"),
-        (Ability::BombPush, "bomb_push"),
-        (Ability::BombFire, "bomb_fire"),
-        (Ability::BombPoison, "bomb_poison"),
-        (Ability::BombDemonic, "bomb_demonic"),
-        (Ability::Summon, "summon"),
-        (Ability::Dash, "dash"),
-        (Ability::Rage, "rage"),
-        (Ability::Heal, "heal"),
-        (Ability::GreatHeal, "great_heal"),
-        (Ability::Bloodlust, "bloodlust"),
-    ];
-    load_map(map, |s| format!("img/icon_ability_{}.png", s)).await
-}
-
-async fn load_lasting_effects() -> ZResult<HashMap<effect::Lasting, Texture2D>> {
-    let map = &[
-        (effect::Lasting::Stun, "stun"),
-        (effect::Lasting::Poison, "poison"),
-        (effect::Lasting::Bloodlust, "bloodlust"),
-    ];
-    load_map(map, |s| format!("img/effect_{}.png", s)).await
 }
 

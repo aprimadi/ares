@@ -16,7 +16,7 @@ struct MainState {
 impl MainState {
     fn new() -> AResult<Self> {
         let start_screen = Box::new(screen::MainMenu::new()?);
-        let screen = screen::ScreenStack::new(start_screen);
+        let screen = screen::ScreenStack::new(start_screen)?;
         Ok(Self { screen })
     }
 
@@ -51,6 +51,7 @@ fn window_conf() -> window::Conf {
 }
 
 #[mq::main(window_conf)]
+#[macroquad(crate_rename = "mq")]
 async fn main() -> AResult {
     let mut state = MainState::new()?;
     loop {

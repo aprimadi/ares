@@ -4,7 +4,9 @@ use mq::math::Vec2;
 use ui::{Gui, Widget};
 
 use crate::AResult;
+use crate::assets;
 use crate::screen::{Screen, StackCommand};
+use crate::utils;
 
 #[derive(Copy, Clone, Debug)]
 enum Action {
@@ -45,9 +47,7 @@ pub struct MainMenu {
 impl MainMenu {
     pub fn new() -> AResult<Self> {
         let gui = make_gui()?;
-        Ok(Self {
-            gui,
-        })
+        Ok(Self { gui })
     }
 }
 
