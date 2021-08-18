@@ -63,6 +63,7 @@ impl Screen for MainMenu {
 
     fn click(&mut self, pos: Vec2) -> AResult<StackCommand> {
         let action = self.gui.click(pos);
+        println!("Pos: {:?}", pos);
         log::trace!("MainMenu: click: pos={:?}, message={:?}", pos, action);
         match action {
             Some(Action::Play) => {

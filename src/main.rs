@@ -3,6 +3,7 @@ use std::time::Duration;
 use mq::{input, window};
 
 mod assets;
+mod core;
 mod error;
 mod screen;
 mod utils;

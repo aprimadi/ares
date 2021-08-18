@@ -2,18 +2,20 @@
 // - Successfully render map
 
 pub struct BattleScreen {
-    
+    scene: Scene,
 }
 
 impl Screen for BattleScreen {
-    fn update(&mut self, _: Duration) -> AResult<StackCommand> {
+    fn update(&mut self, duration: Duration) -> AResult<StackCommand> {
         // TODO: This should, if on enemy turn, execute a series of action by
         // the AI
+        self.scene.tick(duration);
         Ok(StackCommand::None)
     }
 
     fn draw(&self) -> AResult {
         // TODO
+        self.scene.draw();
         Ok(())
     }
 
