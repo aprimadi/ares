@@ -66,92 +66,26 @@ type SpritesInfo = HashMap<String, SpriteInfo>;
 
 #[derive(Debug)]
 pub struct Assets {
-    pub textures: Textures,
     pub font: Font,
-    pub sprites_info: SpritesInfo,
-    pub sprite_frames: HashMap<String, HashMap<String, Texture2D>>,
 }
 
 impl Assets {
     pub async fn load() -> AResult<Self> {
-        let sprites_info: SpritesInfo = deserialize_from_file("sprites.ron").await?;
-        let sprite_frames = {
-            let mut sprite_frames = HashMap::new();
-            for (obj_type, SpriteInfo { paths, .. }) in sprites_info.iter() {
-                let mut frames = HashMap::new();
-                for (frame_name, path) in paths {
-                    frames.insert(frame_name.to_string(), load_texture(path).await?);
-                }
-                sprite_frames.insert(obj_type.clone(), frames);
-            }
-            sprite_frames
-        };
         Ok(Self {
-            textures: Textures::load().await?,
             font: text::load_ttf_font("OpenSans-Regular.ttf").await?,
-            sprites_info,
-            sprite_frames,
-        })
-    }
-}
-
-#[derive(Debug)]
-pub struct Textures {
-    pub map: MapObjectTextures,
-    pub icons: IconTextures,
-    pub dot: Texture2D,
-}
-
-impl Textures {
-    async fn load() -> AResult<Self> {
-        Ok(Self {
-            map: MapObjectTextures::load().await?,
-            icons: IconTextures::load().await?,
-            dot: load_texture("img/dot.png").await?,
         })
     }
 }
 
 #[derive(Debug)]
 pub struct MapObjectTextures {
-    pub selection: Texture2D,
-    pub white_hex: Texture2D,
     pub tile: Texture2D,
-    pub tile_rocks: Texture2D,
-    pub grass: Texture2D,
-    pub blood: Texture2D,
-    pub explosion_ground_mark: Texture2D,
-    pub shadow: Texture2D,
 }
 
 impl MapObjectTextures {
     async fn load() -> AResult<Self> {
         Ok(Self {
-            selection: load_texture("img/selection.png").await?,
-            white_hex: load_texture("img/white_hex.png").await?,
-            tile: load_texture("img/tile.png").await?,
-            tile_rocks: load_texture("img/tile_rocks.png").await?,
-            grass: load_texture("img/grass.png").await?,
-            blood: load_texture("img/blood.png").await?,
-            explosion_ground_mark: load_texture("img/explosion_ground_mark.png").await?,
-            shadow: load_texture("img/shadow.png").await?,
-        })
-    }
-}
-
-#[derive(Debug)]
-pub struct IconTextures {
-    pub info: Texture2D,
-    pub end_turn: Texture2D,
-    pub main_menu: Texture2D,
-}
-
-impl IconTextures {
-    async fn load() -> AResult<Self> {
-        Ok(Self {
-            info: load_texture("img/icon_info.png").await?,
-            end_turn: load_texture("img/icon_end_turn.png").await?,
-            main_menu: load_texture("img/icon_menu.png").await?,
+            tile: load_texture("textures/tile.png").await?,
         })
     }
 }

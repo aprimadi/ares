@@ -6,9 +6,6 @@ edition = "2018"
 license = "MIT"
 description = "A 2D turn-based tactical game."
 
-[profile.dev.package."*"]
-opt-level = 3
-
 [workspace]
 members = ["zgui"]
 

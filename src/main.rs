@@ -53,6 +53,9 @@ fn window_conf() -> window::Conf {
 #[mq::main(window_conf)]
 #[macroquad(crate_rename = "mq")]
 async fn main() -> AResult {
+    env_logger::init();
+    mq::file::set_pc_assets_folder("assets");
+    assets::load().await.expect("Can't load assets");
     let mut state = MainState::new()?;
     loop {
         state.tick().expect("tick failed");

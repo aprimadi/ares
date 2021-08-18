@@ -11,7 +11,7 @@ use crate::utils;
 #[derive(Copy, Clone, Debug)]
 enum Action {
     Exit,
-    StartCampaign,
+    Play,
 }
 
 fn make_gui() -> AResult<ui::Gui<Action>> {
@@ -25,7 +25,7 @@ fn make_gui() -> AResult<ui::Gui<Action>> {
         Ok(Box::new(b))
     };
     let mut layout = Box::new(ui::VLayout::new().stretchable(true));
-    layout.add(button("campaign", Action::StartCampaign)?);
+    layout.add(button("campaign", Action::Play)?);
     #[cfg(not(target_arch = "wasm32"))] // can't quit WASM
     {
         layout.add(space());
@@ -65,7 +65,7 @@ impl Screen for MainMenu {
         let action = self.gui.click(pos);
         log::trace!("MainMenu: click: pos={:?}, message={:?}", pos, action);
         match action {
-            Some(Action::StartCampaign) => {
+            Some(Action::Play) => {
                 /*
                 let screen = screen::Campaign::new()?;
                 Ok(StackCommand::PushScreen(Box::new(screen)))
